@@ -15,7 +15,22 @@ const (
 	upper
 	quoted
 	char
+	sum
+	sub
+	mul
+	div
 )
+
+var charmap = map[rune]int {
+	'+': SUM,
+	'-': SUB,
+	'*': MUL,
+	'/': DIV,
+	'=': EQ,
+	'(': LBR,
+	')': RBR,
+	',': COM,
+}
 
 type item struct {
 	typ int
@@ -54,7 +69,12 @@ func (y *yyLex) Lex(lval *yySymType) int {
 		lval.sval = item.val[1:len(item.val)-1]
 		return STRING
 	case char:
-		return int(item.val[0])
+		c := rune(item.val[0])
+		if ch, ok := charmap[c]; ok {
+			return ch
+		} else {
+			return int(c)
+		}
 	}
 	return eof
 }

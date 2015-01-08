@@ -30,12 +30,13 @@ var ireg = make(map[rune]Interval)
 %token <rval> DREG VREG
 %token <dval> NUMBER
 %token <sval> STRING
+%token EQ LBR RBR COM
 
 %type <dval> dexp
 %type <vval> vexp
 
-%left '+' '-'
-%left '*' '/'
+%left SUM SUB
+%left MUL DIV
 %left UMINUS
 
 %%
@@ -43,25 +44,25 @@ var ireg = make(map[rune]Interval)
 line
 	: dexp			{ fmt.Println($1) }
 	| vexp			{ fmt.Println($1) }
-	| DREG '=' dexp		{ $3.Set($1) }
-	| VREG '=' vexp		{ $3.Set($1) }
+	| DREG EQ dexp		{ $3.Set($1) }
+	| VREG EQ vexp		{ $3.Set($1) }
 	| STRING		{ fmt.Println($1) }
 	;
 
 dexp
 	: NUMBER
 	| DREG			{ $$.Get($1) }
-	| dexp '+' dexp		{ $$ = $1 + $3 }
-	| dexp '-' dexp		{ $$ = $1 - $3 }
-	| dexp '*' dexp		{ $$ = $1 * $3 }
-	| dexp '/' dexp		{ $$ = $1 / $3 }
-	| '-' dexp %prec UMINUS	{ $$ = -$2 }
-	| '(' dexp ')'		{ $$ = $2 }
+	| dexp SUM dexp		{ $$ = $1 + $3 }
+	| dexp SUB dexp		{ $$ = $1 - $3 }
+	| dexp MUL dexp		{ $$ = $1 * $3 }
+	| dexp DIV dexp		{ $$ = $1 / $3 }
+	| SUB dexp %prec UMINUS	{ $$ = -$2 }
+	| LBR dexp RBR		{ $$ = $2 }
 	| error			{ $$ = Number(math.NaN()) }
 	;
 
 vexp
-	: '(' dexp ',' dexp ')'	{
+	: LBR dexp COM dexp RBR	{
 		if $2 > $4 {
 			$$ = Interval{$4, $2}
 		} else {
@@ -69,35 +70,35 @@ vexp
 		}
 	}
 	| VREG			{ $$.Get($1) }
-	| vexp '+' vexp		{ $$ = $3.vadd($1) }
-	| dexp '+' vexp		{ $$ = $3.vadd(Interval{$1, $1}) }
-	| vexp '+' dexp		{ $$ = Interval{$3, $3}.vadd($1) }
-	| vexp '-' vexp		{ $$ = $3.vsub($1) }
-	| dexp '-' vexp		{ $$ = $3.vsub(Interval{$1, $1}) }
-	| vexp '-' dexp		{ $$ = Interval{$3, $3}.vsub($1) }
-	| vexp '*' vexp		{ $$ = $3.vmul($1) }
-	| dexp '*' vexp		{ $$ = $3.vmul(Interval{$1, $1}) }
-	| vexp '*' dexp		{ $$ = Interval{$3, $3}.vmul($1) }
-	| vexp '/' vexp		{
+	| vexp SUM vexp		{ $$ = $3.vadd($1) }
+	| dexp SUM vexp		{ $$ = $3.vadd(Interval{$1, $1}) }
+	| vexp SUM dexp		{ $$ = Interval{$3, $3}.vadd($1) }
+	| vexp SUB vexp		{ $$ = $3.vsub($1) }
+	| dexp SUB vexp		{ $$ = $3.vsub(Interval{$1, $1}) }
+	| vexp SUB dexp		{ $$ = Interval{$3, $3}.vsub($1) }
+	| vexp MUL vexp		{ $$ = $3.vmul($1) }
+	| dexp MUL vexp		{ $$ = $3.vmul(Interval{$1, $1}) }
+	| vexp MUL dexp		{ $$ = Interval{$3, $3}.vmul($1) }
+	| vexp DIV vexp		{
 		if $3.dcheck() {
 			yylex.Error("divisor interval contains 0")
 		}
 		$$ = $3.vdiv($1)
 	}
-	| dexp '/' vexp		{
+	| dexp DIV vexp		{
 		if $3.dcheck() {
 			yylex.Error("divisor interval contains 0")
 		}
 		$$ = $3.vdiv(Interval{$1, $1})
 	}
-	| vexp '/' dexp		{
+	| vexp DIV dexp		{
 		if $3 == 0 {
 			yylex.Error("divisor interval contains 0")
 		}
 		$$ = Interval{$3, $3}.vdiv($1)
 	}
-	| '-' vexp %prec UMINUS	{ $$ = $2.vneg() }
-	| '(' vexp ')'		{ $$ = $2 }
+	| SUB vexp %prec UMINUS	{ $$ = $2.vneg() }
+	| LBR vexp RBR		{ $$ = $2 }
 	;
 
 %%
