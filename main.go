@@ -1,6 +1,7 @@
 package main
 
-//go:generate go tool yacc -o calc.go calc.y
+//go:generate -command yacc go tool yacc
+//go:generate yacc -o calc.go calc.y
 
 import (
 	"bufio"
