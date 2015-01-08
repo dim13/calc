@@ -1,12 +1,20 @@
 PROG := calc
+GO := go
+GOFILES := $(wildcard *.go)
+YYFILES := $(wildcard *.y)
+AUTOGEN := $(YYFILES:.y=.go)
 
-$(PROG): $(wildcard *.go) $(PROG).go
-	go build
+$(PROG): $(GOFILES) $(AUTOGEN)
+	$(GO) build
 
 %.go: %.y
-	go tool yacc -o $@ $<
+	$(GO) tool yacc -o $@ $<
 
 clean:
-	$(RM) $(PROG) $(PROG).go y.output
+	$(GO) clean
+	$(RM) $(AUTOGEN) y.output
+
+install:
+	$(GO) install
 
 .PHONY: clean
