@@ -96,21 +96,16 @@ func (y *yyLex) run() {
 		switch c := y.next(); {
 		case unicode.IsDigit(c):
 			y.lexNumber()
-			y.emit(digit)
 		case unicode.IsUpper(c):
 			y.emit(upper)
 		case unicode.IsLower(c):
 			y.emit(lower)
 		case unicode.IsSpace(c):
 			y.ignore()
-		case c == '\'':
-			if y.lexQuoted() {
-				y.emit(quoted)
-			} else {
-				y.emit(int(c))
-			}
 		case c == eof:
 			return
+		case c == '\'':
+			y.lexQuoted()
 		default:
 			y.emit(char)
 		}
@@ -126,15 +121,17 @@ func (y *yyLex) lexNumber() {
 		y.acceptRune('-')
 		y.acceptDigits()
 	}
+	y.emit(digit)
 }
 
-func (y *yyLex) lexQuoted() bool {
+func (y *yyLex) lexQuoted() {
 	if n := strings.IndexRune(y.input[y.pos:], '\''); n >= 0 {
 		y.pos += n
 		y.next()
-		return true
+		y.emit(quoted)
+	} else {
+		y.emit(char)
 	}
-	return false
 }
 
 func (y *yyLex) emit(t int) {
