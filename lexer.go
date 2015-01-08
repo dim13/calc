@@ -8,7 +8,14 @@ import (
 	"unicode/utf8"
 )
 
-const eof = 0
+const (
+	eof = iota
+	digit
+	lower
+	upper
+	quoted
+	char
+)
 
 type item struct {
 	typ int
@@ -30,18 +37,26 @@ func (y *yyLex) Error(s string) {
 func (y *yyLex) Lex(lval *yySymType) int {
 	item := <-y.items
 	switch item.typ {
-	case NUMBER:
+	case digit:
 		n, err := strconv.ParseFloat(item.val, 64)
 		if err != nil {
 			log.Println(err)
 		}
 		lval.dval = Number(n)
-	case VREG, DREG:
+		return NUMBER
+	case upper:
 		lval.rval = rune(item.val[0])
-	case STRING:
+		return VREG
+	case lower:
+		lval.rval = rune(item.val[0])
+		return DREG
+	case quoted:
 		lval.sval = item.val[1:len(item.val)-1]
+		return STRING
+	case char:
+		return int(item.val[0])
 	}
-	return int(item.typ)
+	return eof
 }
 
 func lex(input string) *yyLex {
@@ -59,23 +74,23 @@ func (y *yyLex) run() {
 		switch c := y.next(); {
 		case unicode.IsDigit(c):
 			y.lexNumber()
-			y.emit(NUMBER)
+			y.emit(digit)
 		case unicode.IsUpper(c):
-			y.emit(VREG)
+			y.emit(upper)
 		case unicode.IsLower(c):
-			y.emit(DREG)
+			y.emit(lower)
 		case unicode.IsSpace(c):
 			y.ignore()
 		case c == '\'':
 			if y.lexQuoted() {
-				y.emit(STRING)
+				y.emit(quoted)
 			} else {
 				y.emit(int(c))
 			}
 		case c == eof:
 			return
 		default:
-			y.emit(int(c))
+			y.emit(char)
 		}
 	}
 }
