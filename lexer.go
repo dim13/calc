@@ -15,13 +15,9 @@ const (
 	upper
 	quoted
 	char
-	sum
-	sub
-	mul
-	div
 )
 
-var charmap = map[rune]int {
+var charmap = map[rune]int{
 	'+': SUM,
 	'-': SUB,
 	'*': MUL,
@@ -30,6 +26,14 @@ var charmap = map[rune]int {
 	'(': LBR,
 	')': RBR,
 	',': COM,
+}
+
+var typemap = map[int]int{
+	digit:  NUMBER,
+	upper:  VREG,
+	lower:  DREG,
+	quoted: STRING,
+	char:   eof,
 }
 
 type item struct {
@@ -49,8 +53,10 @@ func (y *yyLex) Error(s string) {
 	log.Println(s)
 }
 
-func (y *yyLex) Lex(lval *yySymType) int {
+func (y *yyLex) Lex(lval *yySymType) (ret int) {
 	item := <-y.items
+	ret = typemap[item.typ]
+
 	switch item.typ {
 	case digit:
 		n, err := strconv.ParseFloat(item.val, 64)
@@ -58,25 +64,21 @@ func (y *yyLex) Lex(lval *yySymType) int {
 			log.Println(err)
 		}
 		lval.dval = Number(n)
-		return NUMBER
 	case upper:
 		lval.rval = rune(item.val[0])
-		return VREG
 	case lower:
 		lval.rval = rune(item.val[0])
-		return DREG
 	case quoted:
-		lval.sval = item.val[1:len(item.val)-1]
-		return STRING
+		lval.sval = item.val[1 : len(item.val)-1]
 	case char:
 		c := rune(item.val[0])
 		if ch, ok := charmap[c]; ok {
-			return ch
+			ret = ch
 		} else {
-			return int(c)
+			ret = int(c)
 		}
 	}
-	return eof
+	return ret
 }
 
 func lex(input string) *yyLex {
