@@ -1,4 +1,3 @@
-// XXX http://play.golang.org/p/V_dX9jzYzD
 %{
 
 package main
