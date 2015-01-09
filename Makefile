@@ -4,16 +4,22 @@ AUTOGEN := $(YYFILES:.y=.go)
 GO := go
 
 build: $(GOFILES) $(AUTOGEN)
-	$(GO) build
+	$(GO) $@
 
-%.go: %.y
-	$(GO) tool yacc -o $@ $<
+run: $(GOFILES) $(AUTOGEN)
+	$(GO) $@ $^
+
+generate:
+	$(GO) $@
 
 clean:
-	$(GO) clean
+	$(GO) $@
 	$(RM) $(AUTOGEN) y.output
 
 install: build
-	$(GO) install
+	$(GO) $@
+
+%.go: %.y
+	$(GO) tool yacc -o $@ $<
 
 .PHONY: clean
