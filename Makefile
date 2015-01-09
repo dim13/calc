@@ -1,10 +1,9 @@
-PROG := calc
-GO := go
 GOFILES := $(wildcard *.go)
 YYFILES := $(wildcard *.y)
 AUTOGEN := $(YYFILES:.y=.go)
+GO := go
 
-$(PROG): $(GOFILES) $(AUTOGEN)
+build: $(GOFILES) $(AUTOGEN)
 	$(GO) build
 
 %.go: %.y
@@ -14,7 +13,7 @@ clean:
 	$(GO) clean
 	$(RM) $(AUTOGEN) y.output
 
-install:
+install: build
 	$(GO) install
 
 .PHONY: clean
