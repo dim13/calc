@@ -15,12 +15,10 @@ func main() {
 
 	for {
 		os.Stdout.WriteString("\t")
-		//line, err := in.ReadBytes('\n')
 		line, err := in.ReadString('\n')
 		if err == io.EOF {
 			return
 		}
-		//yyParse(&yyLex{input: line})
 		yyParse(lex(line))
 	}
 }
