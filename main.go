@@ -1,6 +1,6 @@
 package main
 
-//go:generate -command yacc go tool yacc
+//go:generate -command yacc goyacc
 //go:generate yacc -o calc.go calc.y
 
 import (
