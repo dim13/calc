@@ -3,7 +3,11 @@
 
 package main
 
-import "math"
+import (
+	"math"
+	"math/rand"
+	"time"
+)
 
 var reg = map[string]float64{
 	"pi": math.Pi,
@@ -46,6 +50,7 @@ exp
 	: NUMBER
 	| WORD			{ $$ = reg[$1] }
 	| '_'			{ $$ = reg[last] }
+	| '!'			{ $$ = rand.Float64() }
 	| exp '+' exp		{ $$ = $1 + $3 }
 	| exp '-' exp		{ $$ = $1 - $3 }
 	| exp '*' exp		{ $$ = $1 * $3 }
@@ -58,6 +63,10 @@ exp
 	;
 
 %%
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func Parse(input string) (float64, bool, error) {
 	l := lex(input)
