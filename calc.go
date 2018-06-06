@@ -4,61 +4,44 @@ package main
 import __yyfmt__ "fmt"
 
 //line calc.y:3
-import (
-	"fmt"
-	"math"
-)
+import "math"
 
-type Number float64
-
-type Interval struct {
-	lo Number
-	hi Number
+var reg = map[string]float64{
+	"pi": math.Pi,
+	"e":  math.E,
 }
 
-var nreg = make(map[rune]Number)
-var ireg = make(map[rune]Interval)
+const last = "_"
 
-//line calc.y:22
+//line calc.y:16
 type yySymType struct {
 	yys  int
-	dval Number
-	vval Interval
-	rval rune
+	fval float64
 	sval string
 }
 
-const DREG = 57346
-const VREG = 57347
-const NUMBER = 57348
-const STRING = 57349
-const EQ = 57350
-const LBR = 57351
-const RBR = 57352
-const COM = 57353
-const SUM = 57354
-const SUB = 57355
-const MUL = 57356
-const DIV = 57357
-const UMINUS = 57358
+const NUMBER = 57346
+const WORD = 57347
+const UMINUS = 57348
 
 var yyToknames = [...]string{
 	"$end",
 	"error",
 	"$unk",
-	"DREG",
-	"VREG",
 	"NUMBER",
-	"STRING",
-	"EQ",
-	"LBR",
-	"RBR",
-	"COM",
-	"SUM",
-	"SUB",
-	"MUL",
-	"DIV",
+	"WORD",
+	"'+'",
+	"'-'",
+	"'*'",
+	"'/'",
+	"'%'",
+	"'^'",
 	"UMINUS",
+	"'='",
+	"'_'",
+	"'('",
+	"')'",
+	"'|'",
 }
 var yyStatenames = [...]string{}
 
@@ -66,70 +49,19 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line calc.y:103
+//line calc.y:59
 
-func (i Interval) String() string {
-	return fmt.Sprint("(", i.lo, ",", i.hi, ")")
+func Parse(input string) (float64, bool) {
+	l := lex(input)
+	yyParse(l)
+	return l.result, l.ok
 }
-
-func hilo(a, b, c, d Number) (v Interval) {
-	if a > b {
-		v.hi = a
-		v.lo = b
-	} else {
-		v.hi = b
-		v.lo = a
-	}
-	if c > d {
-		if c > v.hi {
-			v.hi = c
-		}
-		if d < v.lo {
-			v.lo = d
-		}
-	} else {
-		if d > v.hi {
-			v.hi = d
-		}
-		if c < v.lo {
-			v.lo = c
-		}
-	}
-	return
-}
-
-func (v Interval) vmul(a Interval) Interval {
-	return hilo(a.lo*v.hi, a.lo*v.lo, a.hi*v.hi, a.hi*v.lo)
-}
-
-func (v Interval) dcheck() bool {
-	return v.hi >= 0 && v.lo <= 0
-}
-
-func (v Interval) vdiv(a Interval) Interval {
-	return hilo(a.lo/v.hi, a.lo/v.lo, a.hi/v.hi, a.hi/v.lo)
-}
-
-func (v Interval) vadd(a Interval) Interval {
-	return Interval{a.lo + v.lo, a.hi + v.hi}
-}
-
-func (v Interval) vsub(a Interval) Interval {
-	return Interval{a.lo - v.lo, a.hi - v.hi}
-}
-
-func (v Interval) vneg() Interval {
-	return Interval{lo: -v.hi, hi: -v.lo}
-}
-
-func (n *Number) Set(key rune) { nreg[key] = *n }
-func (n *Number) Get(key rune) { *n = nreg[key] }
-
-func (n *Interval) Set(key rune) { ireg[key] = *n }
-func (n *Interval) Get(key rune) { *n = ireg[key] }
 
 //line yacctab:1
 var yyExca = [...]int{
+	-1, 0,
+	1, 1,
+	-2, 0,
 	-1, 1,
 	1, -1,
 	-2, 0,
@@ -137,78 +69,68 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 110
+const yyLast = 58
 
 var yyAct = [...]int{
 
-	2, 48, 49, 11, 12, 13, 14, 53, 54, 21,
-	25, 20, 27, 29, 31, 33, 36, 38, 40, 42,
-	43, 47, 3, 62, 19, 51, 52, 53, 54, 13,
-	14, 22, 26, 1, 28, 30, 32, 34, 35, 37,
-	39, 41, 0, 46, 0, 55, 56, 17, 18, 0,
-	57, 0, 58, 59, 60, 61, 48, 0, 51, 52,
-	53, 54, 50, 0, 15, 16, 17, 18, 10, 0,
-	4, 5, 7, 6, 0, 9, 0, 0, 0, 8,
-	11, 12, 13, 14, 15, 16, 17, 18, 51, 52,
-	53, 54, 10, 0, 23, 24, 7, 0, 10, 9,
-	23, 0, 7, 8, 0, 45, 0, 0, 0, 44,
+	2, 10, 11, 12, 13, 14, 15, 17, 19, 20,
+	16, 21, 22, 23, 24, 25, 26, 27, 10, 11,
+	12, 13, 14, 15, 15, 9, 1, 4, 18, 29,
+	6, 9, 0, 4, 3, 0, 6, 5, 7, 0,
+	8, 0, 0, 5, 7, 0, 8, 10, 11, 12,
+	13, 14, 15, 12, 13, 14, 15, 28,
 }
 var yyPact = [...]int{
 
-	66, -1000, 68, 72, 16, 3, -1000, -1000, 90, 90,
-	-1000, 90, 90, 90, 90, 90, 90, 90, 90, 96,
-	90, -1000, -1000, -1000, -1000, -9, 52, 15, 33, 15,
-	33, -1000, -1000, -1000, -1000, 33, 15, 33, 15, -1000,
-	-1000, -1000, -1000, 76, 96, 96, 72, 68, -1000, 96,
-	-1000, 96, 96, 96, 96, -1000, 46, 13, -7, -7,
-	-1000, -1000, -1000,
+	29, -1000, -5, -3, -1000, -1000, 23, 23, 23, -1000,
+	23, 23, 23, 23, 23, 23, 23, -1000, -1000, 41,
+	12, 45, 45, 13, 13, 13, -1000, -5, -1000, -1000,
 }
 var yyPgo = [...]int{
 
-	0, 0, 22, 33,
+	0, 0, 26,
 }
 var yyR1 = [...]int{
 
-	0, 3, 3, 3, 3, 3, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2,
+	0, 2, 2, 2, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1,
 }
 var yyR2 = [...]int{
 
-	0, 1, 1, 3, 3, 1, 1, 1, 3, 3,
-	3, 3, 2, 3, 1, 5, 1, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 2,
-	3,
+	0, 0, 1, 3, 1, 1, 1, 3, 3, 3,
+	3, 3, 3, 2, 3, 3, 1,
 }
 var yyChk = [...]int{
 
-	-1000, -3, -1, -2, 4, 5, 7, 6, 13, 9,
-	2, 12, 13, 14, 15, 12, 13, 14, 15, 8,
-	8, -1, -2, 4, 5, -1, -2, -1, -2, -1,
-	-2, -1, -2, -1, -2, -2, -1, -2, -1, -2,
-	-1, -2, -1, -1, 13, 9, -2, -1, 10, 11,
-	10, 12, 13, 14, 15, -1, -1, -1, -1, -1,
-	-1, -1, 10,
+	-1000, -2, -1, 5, 4, 14, 7, 15, 17, 2,
+	6, 7, 8, 9, 10, 11, 13, -1, 5, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1, 16, 17,
 }
 var yyDef = [...]int{
 
-	0, -2, 1, 2, 7, 16, 5, 6, 0, 0,
-	14, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 12, 29, 7, 16, 0, 0, 8, 18, 9,
-	21, 10, 24, 11, 27, 17, 19, 20, 22, 23,
-	25, 26, 28, 3, 0, 0, 4, 0, 13, 0,
-	30, 0, 0, 0, 0, 12, 0, 0, 8, 9,
-	10, 11, 15,
+	-2, -2, 2, 5, 4, 6, 0, 0, 0, 16,
+	0, 0, 0, 0, 0, 0, 0, 13, 5, 0,
+	0, 7, 8, 9, 10, 11, 12, 3, 14, 15,
 }
 var yyTok1 = [...]int{
 
-	1,
+	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 10, 3, 3,
+	15, 16, 8, 6, 3, 7, 3, 9, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 13, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 11, 14, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 17,
 }
 var yyTok2 = [...]int{
 
-	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-	12, 13, 14, 15, 16,
+	2, 3, 4, 5, 12,
 }
 var yyTok3 = [...]int{
 	0,
@@ -551,192 +473,91 @@ yydefault:
 	// dummy call; replaced with literal code
 	switch yynt {
 
-	case 1:
-		yyDollar = yyS[yypt-1 : yypt+1]
-		//line calc.y:44
-		{
-			fmt.Println(yyDollar[1].dval)
-		}
 	case 2:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line calc.y:45
+		//line calc.y:35
 		{
-			fmt.Println(yyDollar[1].vval)
+			reg[last] = yyDollar[1].fval
+			yylex.(*yyLex).result = yyDollar[1].fval
+			yylex.(*yyLex).ok = true
 		}
 	case 3:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:46
+		//line calc.y:40
 		{
-			yyDollar[3].dval.Set(yyDollar[1].rval)
-		}
-	case 4:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:47
-		{
-			yyDollar[3].vval.Set(yyDollar[1].rval)
+			reg[yyDollar[1].sval] = yyDollar[3].fval
 		}
 	case 5:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line calc.y:48
+		//line calc.y:45
 		{
-			fmt.Println(yyDollar[1].sval)
+			yyVAL.fval = reg[yyDollar[1].sval]
+		}
+	case 6:
+		yyDollar = yyS[yypt-1 : yypt+1]
+		//line calc.y:46
+		{
+			yyVAL.fval = reg[last]
 		}
 	case 7:
-		yyDollar = yyS[yypt-1 : yypt+1]
-		//line calc.y:53
+		yyDollar = yyS[yypt-3 : yypt+1]
+		//line calc.y:47
 		{
-			yyVAL.dval.Get(yyDollar[1].rval)
+			yyVAL.fval = yyDollar[1].fval + yyDollar[3].fval
 		}
 	case 8:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:54
+		//line calc.y:48
 		{
-			yyVAL.dval = yyDollar[1].dval + yyDollar[3].dval
+			yyVAL.fval = yyDollar[1].fval - yyDollar[3].fval
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:55
+		//line calc.y:49
 		{
-			yyVAL.dval = yyDollar[1].dval - yyDollar[3].dval
+			yyVAL.fval = yyDollar[1].fval * yyDollar[3].fval
 		}
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:56
+		//line calc.y:50
 		{
-			yyVAL.dval = yyDollar[1].dval * yyDollar[3].dval
+			yyVAL.fval = yyDollar[1].fval / yyDollar[3].fval
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:57
+		//line calc.y:51
 		{
-			yyVAL.dval = yyDollar[1].dval / yyDollar[3].dval
+			yyVAL.fval = math.Mod(yyDollar[1].fval, yyDollar[3].fval)
 		}
 	case 12:
-		yyDollar = yyS[yypt-2 : yypt+1]
-		//line calc.y:58
+		yyDollar = yyS[yypt-3 : yypt+1]
+		//line calc.y:52
 		{
-			yyVAL.dval = -yyDollar[2].dval
+			yyVAL.fval = math.Pow(yyDollar[1].fval, yyDollar[3].fval)
 		}
 	case 13:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:59
+		yyDollar = yyS[yypt-2 : yypt+1]
+		//line calc.y:53
 		{
-			yyVAL.dval = yyDollar[2].dval
+			yyVAL.fval = -yyDollar[2].fval
 		}
 	case 14:
-		yyDollar = yyS[yypt-1 : yypt+1]
-		//line calc.y:60
+		yyDollar = yyS[yypt-3 : yypt+1]
+		//line calc.y:54
 		{
-			yyVAL.dval = Number(math.NaN())
+			yyVAL.fval = yyDollar[2].fval
 		}
 	case 15:
-		yyDollar = yyS[yypt-5 : yypt+1]
-		//line calc.y:64
+		yyDollar = yyS[yypt-3 : yypt+1]
+		//line calc.y:55
 		{
-			if yyDollar[2].dval > yyDollar[4].dval {
-				yyVAL.vval = Interval{yyDollar[4].dval, yyDollar[2].dval}
-			} else {
-				yyVAL.vval = Interval{yyDollar[2].dval, yyDollar[4].dval}
-			}
+			yyVAL.fval = math.Abs(yyDollar[2].fval)
 		}
 	case 16:
 		yyDollar = yyS[yypt-1 : yypt+1]
-		//line calc.y:71
+		//line calc.y:56
 		{
-			yyVAL.vval.Get(yyDollar[1].rval)
-		}
-	case 17:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:72
-		{
-			yyVAL.vval = yyDollar[3].vval.vadd(yyDollar[1].vval)
-		}
-	case 18:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:73
-		{
-			yyVAL.vval = yyDollar[3].vval.vadd(Interval{yyDollar[1].dval, yyDollar[1].dval})
-		}
-	case 19:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:74
-		{
-			yyVAL.vval = Interval{yyDollar[3].dval, yyDollar[3].dval}.vadd(yyDollar[1].vval)
-		}
-	case 20:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:75
-		{
-			yyVAL.vval = yyDollar[3].vval.vsub(yyDollar[1].vval)
-		}
-	case 21:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:76
-		{
-			yyVAL.vval = yyDollar[3].vval.vsub(Interval{yyDollar[1].dval, yyDollar[1].dval})
-		}
-	case 22:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:77
-		{
-			yyVAL.vval = Interval{yyDollar[3].dval, yyDollar[3].dval}.vsub(yyDollar[1].vval)
-		}
-	case 23:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:78
-		{
-			yyVAL.vval = yyDollar[3].vval.vmul(yyDollar[1].vval)
-		}
-	case 24:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:79
-		{
-			yyVAL.vval = yyDollar[3].vval.vmul(Interval{yyDollar[1].dval, yyDollar[1].dval})
-		}
-	case 25:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:80
-		{
-			yyVAL.vval = Interval{yyDollar[3].dval, yyDollar[3].dval}.vmul(yyDollar[1].vval)
-		}
-	case 26:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:81
-		{
-			if yyDollar[3].vval.dcheck() {
-				yylex.Error("divisor interval contains 0")
-			}
-			yyVAL.vval = yyDollar[3].vval.vdiv(yyDollar[1].vval)
-		}
-	case 27:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:87
-		{
-			if yyDollar[3].vval.dcheck() {
-				yylex.Error("divisor interval contains 0")
-			}
-			yyVAL.vval = yyDollar[3].vval.vdiv(Interval{yyDollar[1].dval, yyDollar[1].dval})
-		}
-	case 28:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:93
-		{
-			if yyDollar[3].dval == 0 {
-				yylex.Error("divisor interval contains 0")
-			}
-			yyVAL.vval = Interval{yyDollar[3].dval, yyDollar[3].dval}.vdiv(yyDollar[1].vval)
-		}
-	case 29:
-		yyDollar = yyS[yypt-2 : yypt+1]
-		//line calc.y:99
-		{
-			yyVAL.vval = yyDollar[2].vval.vneg()
-		}
-	case 30:
-		yyDollar = yyS[yypt-3 : yypt+1]
-		//line calc.y:100
-		{
-			yyVAL.vval = yyDollar[2].vval
+			yyVAL.fval = math.NaN()
 		}
 	}
 	goto yystack /* stack new state and value */

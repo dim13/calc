@@ -5,20 +5,21 @@ package main
 
 import (
 	"bufio"
-	"io"
+	"fmt"
 	"os"
 )
 
-func main() {
-	in := bufio.NewReader(os.Stdin)
-	yyDebug = 1
+const promt = "\t"
 
-	for {
-		os.Stdout.WriteString("\t")
-		line, err := in.ReadString('\n')
-		if err == io.EOF {
-			return
+func main() {
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print(promt)
+	for scanner.Scan() {
+		line := scanner.Text()
+		result, ok := Parse(line)
+		if ok {
+			fmt.Printf("%v\n\n", result)
 		}
-		yyParse(lex(line))
+		fmt.Print(promt)
 	}
 }

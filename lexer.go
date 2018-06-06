@@ -10,29 +10,14 @@ import (
 
 const (
 	eof = iota
-	digit
-	lower
-	upper
-	quoted
+	number
+	word
 	char
 )
 
-var charmap = map[rune]int{
-	'+': SUM,
-	'-': SUB,
-	'*': MUL,
-	'/': DIV,
-	'=': EQ,
-	'(': LBR,
-	')': RBR,
-	',': COM,
-}
-
 var typemap = map[int]int{
-	digit:  NUMBER,
-	upper:  VREG,
-	lower:  DREG,
-	quoted: STRING,
+	number: NUMBER,
+	word:   WORD,
 	char:   eof,
 }
 
@@ -42,43 +27,35 @@ type item struct {
 }
 
 type yyLex struct {
-	input string
-	start int
-	pos   int
-	width int
-	items chan item
+	input  string
+	start  int
+	pos    int
+	width  int
+	items  chan item
+	result float64
+	ok     bool
 }
 
 func (y *yyLex) Error(s string) {
 	log.Println(s)
 }
 
-func (y *yyLex) Lex(lval *yySymType) (ret int) {
-	item := <-y.items
-	ret = typemap[item.typ]
-
-	switch item.typ {
-	case digit:
+func (y *yyLex) Lex(lval *yySymType) int {
+	switch item := <-y.items; item.typ {
+	case number:
 		n, err := strconv.ParseFloat(item.val, 64)
 		if err != nil {
 			log.Println(err)
 		}
-		lval.dval = Number(n)
-	case upper:
-		lval.rval = rune(item.val[0])
-	case lower:
-		lval.rval = rune(item.val[0])
-	case quoted:
-		lval.sval = item.val[1 : len(item.val)-1]
+		lval.fval = n
+		return typemap[item.typ]
+	case word:
+		lval.sval = item.val
+		return typemap[item.typ]
 	case char:
-		c := rune(item.val[0])
-		if ch, ok := charmap[c]; ok {
-			ret = ch
-		} else {
-			ret = int(c)
-		}
+		return int(item.val[0])
 	}
-	return ret
+	return eof
 }
 
 func lex(input string) *yyLex {
@@ -96,16 +73,12 @@ func (y *yyLex) run() {
 		switch c := y.next(); {
 		case unicode.IsDigit(c):
 			y.lexNumber()
-		case unicode.IsUpper(c):
-			y.emit(upper)
-		case unicode.IsLower(c):
-			y.emit(lower)
+		case unicode.IsLetter(c):
+			y.lexWord()
 		case unicode.IsSpace(c):
 			y.ignore()
 		case c == eof:
 			return
-		case c == '\'':
-			y.lexQuoted()
 		default:
 			y.emit(char)
 		}
@@ -121,17 +94,12 @@ func (y *yyLex) lexNumber() {
 		y.acceptRune('-')
 		y.acceptDigits()
 	}
-	y.emit(digit)
+	y.emit(number)
 }
 
-func (y *yyLex) lexQuoted() {
-	if n := strings.IndexRune(y.input[y.pos:], '\''); n >= 0 {
-		y.pos += n
-		y.next()
-		y.emit(quoted)
-	} else {
-		y.emit(char)
-	}
+func (y *yyLex) lexWord() {
+	y.acceptLetters()
+	y.emit(word)
 }
 
 func (y *yyLex) emit(t int) {
@@ -168,6 +136,12 @@ func (y *yyLex) peek() rune {
 func (y *yyLex) acceptDigits() {
 	defer y.backup()
 	for unicode.IsDigit(y.next()) {
+	}
+}
+
+func (y *yyLex) acceptLetters() {
+	defer y.backup()
+	for unicode.IsLetter(y.next()) {
 	}
 }
 
