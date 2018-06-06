@@ -38,6 +38,7 @@ line
 				  yylex.(*yyLex).ok = true
 				}
 	| WORD '=' exp		{ reg[$1] = $3 }
+	| error
 	;
 
 exp
@@ -53,13 +54,12 @@ exp
 	| '-' exp %prec UMINUS	{ $$ = -$2 }
 	| '(' exp ')'		{ $$ = $2 }
 	| '|' exp '|'		{ $$ = math.Abs($2) }
-	| error			{ $$ = math.NaN() }
 	;
 
 %%
 
-func Parse(input string) (float64, bool) {
+func Parse(input string) (float64, bool, error) {
 	l := lex(input)
 	yyParse(l)
-	return l.result, l.ok
+	return l.result, l.ok, l.err
 }

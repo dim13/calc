@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"errors"
 	"strconv"
 	"strings"
 	"unicode"
@@ -34,10 +34,11 @@ type yyLex struct {
 	items  chan item
 	result float64
 	ok     bool
+	err    error
 }
 
 func (y *yyLex) Error(s string) {
-	log.Println(s)
+	y.err = errors.New(s)
 }
 
 func (y *yyLex) Lex(lval *yySymType) int {
@@ -45,7 +46,7 @@ func (y *yyLex) Lex(lval *yySymType) int {
 	case number:
 		n, err := strconv.ParseFloat(item.val, 64)
 		if err != nil {
-			log.Println(err)
+			y.Error(err.Error())
 		}
 		lval.fval = n
 		return typemap[item.typ]

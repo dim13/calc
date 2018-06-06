@@ -16,8 +16,10 @@ func main() {
 	fmt.Print(promt)
 	for scanner.Scan() {
 		line := scanner.Text()
-		result, ok := Parse(line)
-		if ok {
+		result, ok, err := Parse(line)
+		if err != nil {
+			fmt.Printf("error: %v\n\n", err)
+		} else if ok {
 			fmt.Printf("%v\n\n", result)
 		}
 		fmt.Print(promt)
