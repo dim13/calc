@@ -15,12 +15,6 @@ const (
 	char
 )
 
-var typemap = map[int]int{
-	number: NUMBER,
-	word:   WORD,
-	char:   eof,
-}
-
 type item struct {
 	typ int
 	val string
@@ -49,14 +43,15 @@ func (y *yyLex) Lex(lval *yySymType) int {
 			y.Error(err.Error())
 		}
 		lval.fval = n
-		return typemap[item.typ]
+		return NUMBER
 	case word:
 		lval.sval = item.val
-		return typemap[item.typ]
+		return WORD
 	case char:
 		return int(item.val[0])
+	default:
+		return eof
 	}
-	return eof
 }
 
 func lex(input string) *yyLex {
