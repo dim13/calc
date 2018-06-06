@@ -157,7 +157,7 @@ func (y *yyLex) acceptRune(valid ...rune) bool {
 }
 
 func (y *yyLex) accept(valid string) bool {
-	if strings.IndexRune(valid, y.next()) >= 0 {
+	if strings.ContainsRune(valid, y.next()) {
 		return true
 	}
 	y.backup()
@@ -165,7 +165,7 @@ func (y *yyLex) accept(valid string) bool {
 }
 
 func (y *yyLex) acceptRun(valid string) {
-	for strings.IndexRune(valid, y.next()) >= 0 {
+	for strings.ContainsRune(valid, y.next()) {
 	}
 	y.backup()
 }
