@@ -50,7 +50,7 @@ exp
 	: NUMBER
 	| WORD			{ $$ = reg[$1] }
 	| '_'			{ $$ = reg[last] }
-	| '!'			{ $$ = rand.Float64() }
+	| '?'			{ $$ = rand.Float64() }
 	| exp '+' exp		{ $$ = $1 + $3 }
 	| exp '-' exp		{ $$ = $1 - $3 }
 	| exp '*' exp		{ $$ = $1 * $3 }

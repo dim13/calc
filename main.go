@@ -9,11 +9,8 @@ import (
 	"os"
 )
 
-const promt = "\t"
-
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Print(promt)
 	for scanner.Scan() {
 		line := scanner.Text()
 		result, ok, err := Parse(line)
@@ -22,6 +19,5 @@ func main() {
 		} else if ok {
 			fmt.Printf("%v\n\n", result)
 		}
-		fmt.Print(promt)
 	}
 }
