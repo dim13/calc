@@ -40,7 +40,6 @@ line
 	| exp			{
 				  reg[last] = $1
 				  yylex.(*yyLex).result = $1
-				  yylex.(*yyLex).ok = true
 				}
 	| WORD '=' exp		{ reg[$1] = $3 }
 	| error
@@ -68,8 +67,8 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func Parse(input string) (float64, bool, error) {
+func Parse(input string) (float64, error) {
 	l := lex(input)
 	yyParse(l)
-	return l.result, l.ok, l.err
+	return l.result, l.err
 }

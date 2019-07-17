@@ -27,7 +27,6 @@ type yyLex struct {
 	width  int
 	items  chan item
 	result float64
-	ok     bool
 	err    error
 }
 

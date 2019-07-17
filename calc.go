@@ -59,16 +59,16 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line calc.y:65
+//line calc.y:64
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func Parse(input string) (float64, bool, error) {
+func Parse(input string) (float64, error) {
 	l := lex(input)
 	yyParse(l)
-	return l.result, l.ok, l.err
+	return l.result, l.err
 }
 
 //line yacctab:1
@@ -496,83 +496,82 @@ yydefault:
 		{
 			reg[last] = yyDollar[1].fval
 			yylex.(*yyLex).result = yyDollar[1].fval
-			yylex.(*yyLex).ok = true
 		}
 	case 3:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:45
+//line calc.y:44
 		{
 			reg[yyDollar[1].sval] = yyDollar[3].fval
 		}
 	case 6:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:51
+//line calc.y:50
 		{
 			yyVAL.fval = reg[yyDollar[1].sval]
 		}
 	case 7:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:52
+//line calc.y:51
 		{
 			yyVAL.fval = reg[last]
 		}
 	case 8:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:53
+//line calc.y:52
 		{
 			yyVAL.fval = rand.Float64()
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:54
+//line calc.y:53
 		{
 			yyVAL.fval = yyDollar[1].fval + yyDollar[3].fval
 		}
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:55
+//line calc.y:54
 		{
 			yyVAL.fval = yyDollar[1].fval - yyDollar[3].fval
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:56
+//line calc.y:55
 		{
 			yyVAL.fval = yyDollar[1].fval * yyDollar[3].fval
 		}
 	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:57
+//line calc.y:56
 		{
 			yyVAL.fval = yyDollar[1].fval / yyDollar[3].fval
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:58
+//line calc.y:57
 		{
 			yyVAL.fval = math.Mod(yyDollar[1].fval, yyDollar[3].fval)
 		}
 	case 14:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:59
+//line calc.y:58
 		{
 			yyVAL.fval = math.Pow(yyDollar[1].fval, yyDollar[3].fval)
 		}
 	case 15:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line calc.y:60
+//line calc.y:59
 		{
 			yyVAL.fval = -yyDollar[2].fval
 		}
 	case 16:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:61
+//line calc.y:60
 		{
 			yyVAL.fval = yyDollar[2].fval
 		}
 	case 17:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:62
+//line calc.y:61
 		{
 			yyVAL.fval = math.Abs(yyDollar[2].fval)
 		}
