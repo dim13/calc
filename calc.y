@@ -35,10 +35,7 @@ var last float64
 
 line
 	:			/* empty */
-	| exp			{
-				  last = $1
-				  yylex.(*yyLex).result = $1
-				}
+	| exp			{ last, yylex.(*yyLex).result = $1, $1 }
 	| error
 	;
 
@@ -51,10 +48,7 @@ exp
 				  }
 				  $$ = v
 				}
-	| WORD '=' exp		{
-				  reg[$1] = $3
-				  $$ = $3
-				}
+	| WORD '=' exp		{ $$, reg[$1] = $3, $3 }
 	| '_'			{ $$ = last }
 	| '?'			{ $$ = rand.Float64() }
 	| exp '+' exp		{ $$ = $1 + $3 }
