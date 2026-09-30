@@ -17,7 +17,7 @@ var reg = map[string]float64{
 	"e":  math.E,
 }
 
-const last = "_"
+var last float64
 
 //line calc.y:18
 type yySymType struct {
@@ -36,6 +36,7 @@ var yyToknames = [...]string{
 	"$unk",
 	"NUMBER",
 	"WORD",
+	"'='",
 	"'+'",
 	"'-'",
 	"'*'",
@@ -43,7 +44,6 @@ var yyToknames = [...]string{
 	"'%'",
 	"UMINUS",
 	"'^'",
-	"'='",
 	"'_'",
 	"'?'",
 	"'('",
@@ -57,7 +57,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line calc.y:61
+//line calc.y:71
 
 func Parse(input string) (float64, error) {
 	l := lex(input)
@@ -77,23 +77,23 @@ var yyExca = [...]int8{
 
 const yyPrivate = 57344
 
-const yyLast = 70
+const yyLast = 71
 
 var yyAct = [...]int8{
-	2, 11, 12, 13, 14, 15, 17, 16, 16, 18,
-	20, 21, 22, 23, 24, 25, 26, 27, 28, 4,
-	1, 5, 3, 0, 8, 0, 13, 14, 15, 0,
-	16, 6, 7, 9, 0, 10, 11, 12, 13, 14,
-	15, 0, 16, 5, 19, 0, 8, 0, 30, 0,
-	0, 0, 0, 6, 7, 9, 0, 10, 11, 12,
-	13, 14, 15, 0, 16, 0, 0, 0, 0, 29,
+	2, 11, 12, 13, 14, 15, 16, 16, 17, 18,
+	19, 20, 21, 22, 23, 24, 25, 26, 27, 3,
+	1, 4, 5, 0, 0, 8, 0, 0, 0, 0,
+	0, 6, 7, 9, 0, 10, 11, 12, 13, 14,
+	15, 0, 16, 0, 4, 5, 0, 29, 8, 0,
+	0, 0, 0, 0, 6, 7, 9, 0, 10, 11,
+	12, 13, 14, 15, 0, 16, 13, 14, 15, 28,
+	16,
 }
 
 var yyPact = [...]int16{
-	17, -32768, -5, -7, -32768, -32768, -32768, -32768, 39, 39,
-	39, 39, 39, 39, 39, 39, 39, 39, -4, -32768,
-	52, 30, 18, 18, -4, -4, -4, -4, -5, -32768,
-	-32768,
+	17, -32768, -6, -32768, -32768, 2, -32768, -32768, 40, 40,
+	40, 40, 40, 40, 40, 40, 40, 40, -7, 52,
+	29, 57, 57, -7, -7, -7, -7, -6, -32768, -32768,
 }
 
 var yyPgo = [...]int8{
@@ -101,47 +101,45 @@ var yyPgo = [...]int8{
 }
 
 var yyR1 = [...]int8{
-	0, 2, 2, 2, 2, 1, 1, 1, 1, 1,
+	0, 2, 2, 2, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1,
 }
 
 var yyR2 = [...]int8{
-	0, 0, 1, 3, 1, 1, 1, 1, 1, 3,
+	0, 0, 1, 1, 1, 1, 3, 1, 1, 3,
 	3, 3, 3, 3, 3, 2, 3, 3,
 }
 
 var yyChk = [...]int16{
-	-32768, -2, -1, 5, 2, 4, 14, 15, 7, 16,
-	18, 6, 7, 8, 9, 10, 12, 13, -1, 5,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, 17,
-	18,
+	-32768, -2, -1, 2, 4, 5, 14, 15, 8, 16,
+	18, 7, 8, 9, 10, 11, 13, 6, -1, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1, 17, 18,
 }
 
 var yyDef = [...]int8{
-	-2, -2, 2, 6, 4, 5, 7, 8, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 15, 6,
-	0, 0, 9, 10, 11, 12, 13, 14, 3, 16,
-	17,
+	-2, -2, 2, 3, 4, 5, 7, 8, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 15, 0,
+	0, 9, 10, 11, 12, 13, 14, 6, 16, 17,
 }
 
 var yyTok1 = [...]int8{
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 10, 3, 3,
-	16, 17, 8, 6, 3, 7, 3, 9, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 11, 3, 3,
+	16, 17, 9, 7, 3, 8, 3, 10, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 13, 3, 15, 3, 3, 3, 3, 3, 3,
+	3, 6, 3, 15, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 12, 14, 3, 3, 3, 3,
+	3, 3, 3, 3, 13, 14, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 18,
 }
 
 var yyTok2 = [...]int8{
-	2, 3, 4, 5, 11,
+	2, 3, 4, 5, 12,
 }
 
 var yyTok3 = [...]int8{
@@ -487,86 +485,91 @@ yydefault:
 
 	case 2:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:37
+//line calc.y:38
 		{
-			reg[last] = yyDollar[1].fval
+			last = yyDollar[1].fval
 			yylex.(*yyLex).result = yyDollar[1].fval
 		}
-	case 3:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:41
-		{
-			reg[yyDollar[1].sval] = yyDollar[3].fval
-		}
-	case 6:
+	case 5:
 		yyDollar = yyS[yypt-1 : yypt+1]
 //line calc.y:47
 		{
-			yyVAL.fval = reg[yyDollar[1].sval]
+			v, ok := reg[yyDollar[1].sval]
+			if !ok {
+				yylex.Error("undefined: " + yyDollar[1].sval)
+			}
+			yyVAL.fval = v
+		}
+	case 6:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line calc.y:54
+		{
+			reg[yyDollar[1].sval] = yyDollar[3].fval
+			yyVAL.fval = yyDollar[3].fval
 		}
 	case 7:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:48
+//line calc.y:58
 		{
-			yyVAL.fval = reg[last]
+			yyVAL.fval = last
 		}
 	case 8:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:49
+//line calc.y:59
 		{
 			yyVAL.fval = rand.Float64()
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:50
+//line calc.y:60
 		{
 			yyVAL.fval = yyDollar[1].fval + yyDollar[3].fval
 		}
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:51
+//line calc.y:61
 		{
 			yyVAL.fval = yyDollar[1].fval - yyDollar[3].fval
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:52
+//line calc.y:62
 		{
 			yyVAL.fval = yyDollar[1].fval * yyDollar[3].fval
 		}
 	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:53
+//line calc.y:63
 		{
 			yyVAL.fval = yyDollar[1].fval / yyDollar[3].fval
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:54
+//line calc.y:64
 		{
 			yyVAL.fval = math.Mod(yyDollar[1].fval, yyDollar[3].fval)
 		}
 	case 14:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:55
+//line calc.y:65
 		{
 			yyVAL.fval = math.Pow(yyDollar[1].fval, yyDollar[3].fval)
 		}
 	case 15:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line calc.y:56
+//line calc.y:66
 		{
 			yyVAL.fval = -yyDollar[2].fval
 		}
 	case 16:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:57
+//line calc.y:67
 		{
 			yyVAL.fval = yyDollar[2].fval
 		}
 	case 17:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:58
+//line calc.y:68
 		{
 			yyVAL.fval = math.Abs(yyDollar[2].fval)
 		}

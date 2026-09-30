@@ -11,7 +11,7 @@ var reg = map[string]float64{
 	"e":  math.E,
 }
 
-const last = "_"
+var last float64
 
 %}
 
@@ -25,6 +25,7 @@ const last = "_"
 
 %type <fval> exp
 
+%right '='
 %left '+' '-'
 %left '*' '/' '%'
 %left UMINUS
@@ -35,17 +36,26 @@ const last = "_"
 line
 	:			/* empty */
 	| exp			{
-				  reg[last] = $1
+				  last = $1
 				  yylex.(*yyLex).result = $1
 				}
-	| WORD '=' exp		{ reg[$1] = $3 }
 	| error
 	;
 
 exp
 	: NUMBER
-	| WORD			{ $$ = reg[$1] }
-	| '_'			{ $$ = reg[last] }
+	| WORD			{
+				  v, ok := reg[$1]
+				  if !ok {
+					yylex.Error("undefined: " + $1)
+				  }
+				  $$ = v
+				}
+	| WORD '=' exp		{
+				  reg[$1] = $3
+				  $$ = $3
+				}
+	| '_'			{ $$ = last }
 	| '?'			{ $$ = rand.Float64() }
 	| exp '+' exp		{ $$ = $1 + $3 }
 	| exp '-' exp		{ $$ = $1 - $3 }
