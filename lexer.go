@@ -40,6 +40,8 @@ func (y *yyLex) Lex(lval *yySymType) int {
 		n, err := strconv.ParseFloat(item.val, 64)
 		if err != nil {
 			y.Error(err.Error())
+			y.drain()
+			return eof
 		}
 		lval.fval = n
 		return NUMBER
@@ -62,11 +64,17 @@ func lex(input string) *yyLex {
 	return l
 }
 
+func (y *yyLex) drain() {
+	for range y.items {
+	}
+}
+
 func (y *yyLex) run() {
 	defer close(y.items)
 	for {
 		switch c := y.next(); {
-		case unicode.IsDigit(c):
+		case unicode.IsDigit(c) || c == '.':
+			y.backup()
 			y.lexNumber()
 		case unicode.IsLetter(c):
 			y.lexWord()
@@ -86,7 +94,7 @@ func (y *yyLex) lexNumber() {
 		y.acceptDigits()
 	}
 	if y.acceptRune('e', 'E') {
-		y.acceptRune('-')
+		y.acceptRune('+', '-')
 		y.acceptDigits()
 	}
 	y.emit(number)

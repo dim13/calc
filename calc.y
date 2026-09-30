@@ -4,7 +4,6 @@ package main
 import (
 	"math"
 	"math/rand"
-	"time"
 )
 
 var reg = map[string]float64{
@@ -28,8 +27,8 @@ const last = "_"
 
 %left '+' '-'
 %left '*' '/' '%'
-%left '^'
 %left UMINUS
+%right '^'
 
 %%
 
@@ -60,10 +59,6 @@ exp
 	;
 
 %%
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 func Parse(input string) (float64, error) {
 	l := lex(input)

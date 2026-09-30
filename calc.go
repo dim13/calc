@@ -10,7 +10,6 @@ import __yyfmt__ "fmt"
 import (
 	"math"
 	"math/rand"
-	"time"
 )
 
 var reg = map[string]float64{
@@ -20,7 +19,7 @@ var reg = map[string]float64{
 
 const last = "_"
 
-//line calc.y:19
+//line calc.y:18
 type yySymType struct {
 	yys  int
 	fval float64
@@ -42,8 +41,8 @@ var yyToknames = [...]string{
 	"'*'",
 	"'/'",
 	"'%'",
-	"'^'",
 	"UMINUS",
+	"'^'",
 	"'='",
 	"'_'",
 	"'?'",
@@ -58,11 +57,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line calc.y:62
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
+//line calc.y:61
 
 func Parse(input string) (float64, error) {
 	l := lex(input)
@@ -82,21 +77,22 @@ var yyExca = [...]int8{
 
 const yyPrivate = 57344
 
-const yyLast = 58
+const yyLast = 70
 
 var yyAct = [...]int8{
-	2, 11, 12, 13, 14, 15, 16, 17, 16, 18,
+	2, 11, 12, 13, 14, 15, 17, 16, 16, 18,
 	20, 21, 22, 23, 24, 25, 26, 27, 28, 4,
-	1, 5, 3, 0, 8, 11, 12, 13, 14, 15,
-	16, 6, 7, 9, 0, 10, 0, 30, 5, 19,
-	0, 8, 11, 12, 13, 14, 15, 16, 6, 7,
-	9, 0, 10, 29, 13, 14, 15, 16,
+	1, 5, 3, 0, 8, 0, 13, 14, 15, 0,
+	16, 6, 7, 9, 0, 10, 11, 12, 13, 14,
+	15, 0, 16, 5, 19, 0, 8, 0, 30, 0,
+	0, 0, 0, 6, 7, 9, 0, 10, 11, 12,
+	13, 14, 15, 0, 16, 0, 0, 0, 0, 29,
 }
 
 var yyPact = [...]int16{
-	17, -32768, -5, -6, -32768, -32768, -32768, -32768, 34, 34,
-	34, 34, 34, 34, 34, 34, 34, 34, -32768, -32768,
-	36, 19, 46, 46, -3, -3, -3, -32768, -5, -32768,
+	17, -32768, -5, -7, -32768, -32768, -32768, -32768, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, -4, -32768,
+	52, 30, 18, 18, -4, -4, -4, -4, -5, -32768,
 	-32768,
 }
 
@@ -116,7 +112,7 @@ var yyR2 = [...]int8{
 
 var yyChk = [...]int16{
 	-32768, -2, -1, 5, 2, 4, 14, 15, 7, 16,
-	18, 6, 7, 8, 9, 10, 11, 13, -1, 5,
+	18, 6, 7, 8, 9, 10, 12, 13, -1, 5,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, 17,
 	18,
 }
@@ -138,14 +134,14 @@ var yyTok1 = [...]int8{
 	3, 13, 3, 15, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 11, 14, 3, 3, 3, 3,
+	3, 3, 3, 3, 12, 14, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 18,
 }
 
 var yyTok2 = [...]int8{
-	2, 3, 4, 5, 12,
+	2, 3, 4, 5, 11,
 }
 
 var yyTok3 = [...]int8{
@@ -491,86 +487,86 @@ yydefault:
 
 	case 2:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:38
+//line calc.y:37
 		{
 			reg[last] = yyDollar[1].fval
 			yylex.(*yyLex).result = yyDollar[1].fval
 		}
 	case 3:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:42
+//line calc.y:41
 		{
 			reg[yyDollar[1].sval] = yyDollar[3].fval
 		}
 	case 6:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:48
+//line calc.y:47
 		{
 			yyVAL.fval = reg[yyDollar[1].sval]
 		}
 	case 7:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:49
+//line calc.y:48
 		{
 			yyVAL.fval = reg[last]
 		}
 	case 8:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line calc.y:50
+//line calc.y:49
 		{
 			yyVAL.fval = rand.Float64()
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:51
+//line calc.y:50
 		{
 			yyVAL.fval = yyDollar[1].fval + yyDollar[3].fval
 		}
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:52
+//line calc.y:51
 		{
 			yyVAL.fval = yyDollar[1].fval - yyDollar[3].fval
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:53
+//line calc.y:52
 		{
 			yyVAL.fval = yyDollar[1].fval * yyDollar[3].fval
 		}
 	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:54
+//line calc.y:53
 		{
 			yyVAL.fval = yyDollar[1].fval / yyDollar[3].fval
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:55
+//line calc.y:54
 		{
 			yyVAL.fval = math.Mod(yyDollar[1].fval, yyDollar[3].fval)
 		}
 	case 14:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:56
+//line calc.y:55
 		{
 			yyVAL.fval = math.Pow(yyDollar[1].fval, yyDollar[3].fval)
 		}
 	case 15:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line calc.y:57
+//line calc.y:56
 		{
 			yyVAL.fval = -yyDollar[2].fval
 		}
 	case 16:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:58
+//line calc.y:57
 		{
 			yyVAL.fval = yyDollar[2].fval
 		}
 	case 17:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line calc.y:59
+//line calc.y:58
 		{
 			yyVAL.fval = math.Abs(yyDollar[2].fval)
 		}
